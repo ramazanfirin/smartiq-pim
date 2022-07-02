@@ -3,9 +3,8 @@ version: '3.8'
 services:
   pim-mysql:
     image: mysql:8.0.28
-    #platform: linux/x86_64
-    # volumes:
-    #   - ~/volumes/jhipster/pim/mysql/:/var/lib/mysql/
+    volumes:
+      - ~/volumes/jhipster/pim/mysql/:/var/lib/mysql/
     environment:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=pim

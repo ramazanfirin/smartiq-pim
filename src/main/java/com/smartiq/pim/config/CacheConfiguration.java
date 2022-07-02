@@ -51,6 +51,9 @@ public class CacheConfiguration {
             createCache(cm, com.smartiq.pim.domain.User.class.getName());
             createCache(cm, com.smartiq.pim.domain.Authority.class.getName());
             createCache(cm, com.smartiq.pim.domain.User.class.getName() + ".authorities");
+            createCache(cm, com.smartiq.pim.domain.Category.class.getName());
+            createCache(cm, com.smartiq.pim.domain.Category.class.getName() + ".products");
+            createCache(cm, com.smartiq.pim.domain.Product.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

@@ -1,0 +1,19 @@
+entity Category {
+  name String required
+}
+
+entity Product {
+  name String required
+  description String
+  price Double required
+  stock Integer required
+  photo ImageBlob required
+}
+
+
+relationship ManyToOne {
+  Product to Category
+}
+
+paginate Category with pagination
+paginate Product with pagination
