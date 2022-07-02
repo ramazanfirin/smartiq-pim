@@ -27,10 +27,10 @@
                 <constraints nullable="false" />
             </column>
             <column name="photo" type="longblob">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
             <column name="photo_content_type" type="varchar(255)">
-                <constraints nullable="false" />
+                <constraints nullable="true" />
             </column>
             <column name="category_id" type="bigint">
                 <constraints nullable="true" />

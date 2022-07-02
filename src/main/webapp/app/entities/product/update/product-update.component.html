@@ -97,11 +97,6 @@
             id="field_photoContentType"
             formControlName="photoContentType"
           />
-          <div *ngIf="editForm.get('photo')!.invalid && (editForm.get('photo')!.dirty || editForm.get('photo')!.touched)">
-            <small class="form-text text-danger" *ngIf="editForm.get('photo')?.errors?.required" jhiTranslate="entity.validation.required">
-              This field is required.
-            </small>
-          </div>
         </div>
 
         <div class="row mb-3">

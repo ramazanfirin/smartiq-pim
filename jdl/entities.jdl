@@ -7,7 +7,7 @@ entity Product {
   description String
   price Double required
   stock Integer required
-  photo ImageBlob required
+  photo ImageBlob
 }
 
 

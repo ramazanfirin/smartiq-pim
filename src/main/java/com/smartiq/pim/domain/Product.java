@@ -38,11 +38,10 @@ public class Product implements Serializable {
     private Integer stock;
 
     @Lob
-    @Column(name = "photo", nullable = false)
+    @Column(name = "photo")
     private byte[] photo;
 
-    @NotNull
-    @Column(name = "photo_content_type", nullable = false)
+    @Column(name = "photo_content_type")
     private String photoContentType;
 
     @ManyToOne

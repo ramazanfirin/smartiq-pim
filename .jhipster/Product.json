@@ -27,8 +27,7 @@
     {
       "fieldName": "photo",
       "fieldType": "byte[]",
-      "fieldTypeBlobContent": "image",
-      "fieldValidateRules": ["required"]
+      "fieldTypeBlobContent": "image"
     }
   ],
   "fluentMethods": true,

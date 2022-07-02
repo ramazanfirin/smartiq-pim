@@ -6,8 +6,8 @@ export interface IProduct {
   description?: string | null;
   price?: number;
   stock?: number;
-  photoContentType?: string;
-  photo?: string;
+  photoContentType?: string | null;
+  photo?: string | null;
   category?: ICategory | null;
 }
 
@@ -18,8 +18,8 @@ export class Product implements IProduct {
     public description?: string | null,
     public price?: number,
     public stock?: number,
-    public photoContentType?: string,
-    public photo?: string,
+    public photoContentType?: string | null,
+    public photo?: string | null,
     public category?: ICategory | null
   ) {}
 }
