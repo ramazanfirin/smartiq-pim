@@ -21,6 +21,7 @@
       "createDate": "Create Date",
       "status": "Status",
       "totalCost": "Total Cost",
+      "user": "User",
       "basketItem": "Basket Item"
     }
   }

@@ -29,6 +29,12 @@
   "readOnly": false,
   "relationships": [
     {
+      "otherEntityName": "user",
+      "otherEntityRelationshipName": "basket",
+      "relationshipName": "user",
+      "relationshipType": "many-to-one"
+    },
+    {
       "otherEntityName": "basketItem",
       "otherEntityRelationshipName": "basket",
       "relationshipName": "basketItem",

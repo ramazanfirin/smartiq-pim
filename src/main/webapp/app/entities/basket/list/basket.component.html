@@ -40,6 +40,7 @@
           <th scope="col" jhiSortBy="totalCost">
             <span jhiTranslate="pimApp.basket.totalCost">Total Cost</span> <fa-icon icon="sort"></fa-icon>
           </th>
+          <th scope="col" jhiSortBy="user.id"><span jhiTranslate="pimApp.basket.user">User</span> <fa-icon icon="sort"></fa-icon></th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -51,6 +52,9 @@
           <td>{{ basket.createDate | formatMediumDate }}</td>
           <td jhiTranslate="{{ 'pimApp.BasketStatus.' + basket.status }}">{{ basket.status }}</td>
           <td>{{ basket.totalCost }}</td>
+          <td>
+            {{ basket.user?.id }}
+          </td>
           <td class="text-end">
             <div class="btn-group">
               <button type="submit" [routerLink]="['/basket', basket.id, 'view']" class="btn btn-info btn-sm" data-cy="entityDetailsButton">

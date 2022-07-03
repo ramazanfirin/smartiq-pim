@@ -26,7 +26,7 @@ relationship ManyToOne {
   Product to Category
   BasketItem to Basket
   BasketItem to Product
-  
+  Basket to User
 }
 
 

@@ -31,7 +31,7 @@ public class BasketItem implements Serializable {
     private Integer totalCost;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "basketItems" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "user", "basketItems" }, allowSetters = true)
     private Basket basket;
 
     @ManyToOne

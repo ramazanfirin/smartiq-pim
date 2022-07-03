@@ -9,6 +9,9 @@ import { of, Subject, from } from 'rxjs';
 import { BasketService } from '../service/basket.service';
 import { IBasket, Basket } from '../basket.model';
 
+import { IUser } from 'app/entities/user/user.model';
+import { UserService } from 'app/entities/user/user.service';
+
 import { BasketUpdateComponent } from './basket-update.component';
 
 describe('Basket Management Update Component', () => {
@@ -16,6 +19,7 @@ describe('Basket Management Update Component', () => {
   let fixture: ComponentFixture<BasketUpdateComponent>;
   let activatedRoute: ActivatedRoute;
   let basketService: BasketService;
+  let userService: UserService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -37,18 +41,41 @@ describe('Basket Management Update Component', () => {
     fixture = TestBed.createComponent(BasketUpdateComponent);
     activatedRoute = TestBed.inject(ActivatedRoute);
     basketService = TestBed.inject(BasketService);
+    userService = TestBed.inject(UserService);
 
     comp = fixture.componentInstance;
   });
 
   describe('ngOnInit', () => {
+    it('Should call User query and add missing value', () => {
+      const basket: IBasket = { id: 456 };
+      const user: IUser = { id: 34508 };
+      basket.user = user;
+
+      const userCollection: IUser[] = [{ id: 10210 }];
+      jest.spyOn(userService, 'query').mockReturnValue(of(new HttpResponse({ body: userCollection })));
+      const additionalUsers = [user];
+      const expectedCollection: IUser[] = [...additionalUsers, ...userCollection];
+      jest.spyOn(userService, 'addUserToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ basket });
+      comp.ngOnInit();
+
+      expect(userService.query).toHaveBeenCalled();
+      expect(userService.addUserToCollectionIfMissing).toHaveBeenCalledWith(userCollection, ...additionalUsers);
+      expect(comp.usersSharedCollection).toEqual(expectedCollection);
+    });
+
     it('Should update editForm', () => {
       const basket: IBasket = { id: 456 };
+      const user: IUser = { id: 72431 };
+      basket.user = user;
 
       activatedRoute.data = of({ basket });
       comp.ngOnInit();
 
       expect(comp.editForm.value).toEqual(expect.objectContaining(basket));
+      expect(comp.usersSharedCollection).toContain(user);
     });
   });
 
@@ -113,6 +140,16 @@ describe('Basket Management Update Component', () => {
       expect(basketService.update).toHaveBeenCalledWith(basket);
       expect(comp.isSaving).toEqual(false);
       expect(comp.previousState).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Tracking relationships identifiers', () => {
+    describe('trackUserById', () => {
+      it('Should return tracked User primary key', () => {
+        const entity = { id: 123 };
+        const trackResult = comp.trackUserById(0, entity);
+        expect(trackResult).toEqual(entity.id);
+      });
     });
   });
 });

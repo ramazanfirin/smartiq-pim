@@ -7,14 +7,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.smartiq.pim.IntegrationTest;
 import com.smartiq.pim.domain.Basket;
+import com.smartiq.pim.domain.BasketItem;
+import com.smartiq.pim.domain.Product;
+import com.smartiq.pim.domain.User;
 import com.smartiq.pim.domain.enumeration.BasketStatus;
+import com.smartiq.pim.repository.BasketItemRepository;
 import com.smartiq.pim.repository.BasketRepository;
+import com.smartiq.pim.repository.ProductRepository;
+import com.smartiq.pim.repository.UserRepository;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +57,15 @@ class BasketResourceIT {
 
     @Autowired
     private BasketRepository basketRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    ProductRepository productRepository;
+
+    @Autowired
+    BasketItemRepository basketItemRepository;
 
     @Autowired
     private EntityManager em;
@@ -434,5 +451,123 @@ class BasketResourceIT {
         // Validate the database contains one less item
         List<Basket> basketList = basketRepository.findAll();
         assertThat(basketList).hasSize(databaseSizeBeforeDelete - 1);
+    }
+
+    @Test
+    @Transactional
+    void createOrGetActiveBasket() throws Exception {
+        int databaseSizeBeforeDelete = basketRepository.findAll().size();
+        assertThat(databaseSizeBeforeDelete).isEqualTo(0);
+
+        User user = new User();
+        user.setLogin("DEFAULT_LOGIN");
+        user.setPassword(RandomStringUtils.random(60));
+        user.setActivated(true);
+        user.setEmail(RandomStringUtils.randomAlphabetic(5) + "johndoe@localhost");
+        user.setFirstName("DEFAULT_FIRSTNAME");
+        user.setLastName("DEFAULT_LASTNAME");
+        user.setImageUrl("DEFAULT_IMAGEURL");
+        user.setLangKey("TR");
+        userRepository.save(user);
+
+        restBasketMockMvc
+            .perform(
+                get(ENTITY_API_URL + "/createOrGetActiveBasket")
+                    .with(request -> {
+                        request.setRemoteUser("DEFAULT_LOGIN");
+                        return request;
+                    })
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk());
+
+        // Validate the database contains one less item
+        List<Basket> basketList = basketRepository.findAll();
+        assertThat(basketList.size()).isEqualTo(1);
+        assertThat(basketList.get(0).getStatus()).isEqualTo(BasketStatus.ACTIVE);
+    }
+
+    @Test
+    @Transactional
+    void addItem() throws Exception {
+        int databaseSizeBeforeDelete = basketRepository.findAll().size();
+        assertThat(databaseSizeBeforeDelete).isEqualTo(0);
+
+        Product product = new Product();
+        product.setName("name");
+        product.setPrice(Double.valueOf(100));
+        product.setStock(100);
+        productRepository.save(product);
+
+        restBasketMockMvc
+            .perform(
+                post(ENTITY_API_URL + "/addItem/" + product.getId())
+                    .with(request -> {
+                        request.setRemoteUser("DEFAULT_LOGIN");
+                        return request;
+                    })
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk());
+        // Validate the database contains one less item
+        List<Basket> basketList = basketRepository.findAll();
+        //basketRepository.getById(basketList.get(0).getId());
+        assertThat(basketList.size()).isEqualTo(1);
+        assertThat(basketList.get(0).getStatus()).isEqualTo(BasketStatus.ACTIVE);
+        assertThat(basketList.get(0).getBasketItems().size()).isEqualTo(1);
+        assertThat(basketList.get(0).getBasketItems().size()).isEqualTo(1);
+    }
+
+    @Test
+    @Transactional
+    void deleteItem() throws Exception {
+        int databaseSizeBeforeDelete = basketRepository.findAll().size();
+        assertThat(databaseSizeBeforeDelete).isEqualTo(0);
+
+        //        User user = new User();
+        //        user.setLogin("user");
+        //        user.setPassword(RandomStringUtils.random(60));
+        //        user.setActivated(true);
+        //        user.setEmail(RandomStringUtils.randomAlphabetic(5) + "johndoe@localhost");
+        //        user.setFirstName("DEFAULT_FIRSTNAME");
+        //        user.setLastName("DEFAULT_LASTNAME");
+        //        user.setImageUrl("DEFAULT_IMAGEURL");
+        //        user.setLangKey("TR");
+        //        userRepository.save(user);
+
+        User user = userRepository.findOneByLogin("user").get();
+
+        Product product = new Product();
+        product.setName("name");
+        product.setPrice(Double.valueOf(100));
+        product.setStock(100);
+        productRepository.save(product);
+
+        BasketItem basketItem = new BasketItem();
+        basketItem.setProduct(product);
+        basketItem.setBasket(basket);
+        basketItem.setQuantity(1);
+        basketItem.setTotalCost(basketItem.getProduct().getPrice().intValue());
+        basketItemRepository.save(basketItem);
+        basket.getBasketItems().add(basketItem);
+        basket.setUser(user);
+        basketRepository.save(basket);
+
+        restBasketMockMvc
+            .perform(
+                get(ENTITY_API_URL + "/deleteItem/" + basketItem.getId())
+                    .with(request -> {
+                        request.setRemoteUser("user");
+                        return request;
+                    })
+                    .accept(MediaType.APPLICATION_JSON)
+            )
+            .andExpect(status().isOk());
+        // Validate the database contains one less item
+        List<Basket> basketList = basketRepository.findAll();
+        //basketRepository.getById(basketList.get(0).getId());
+        assertThat(basketList.size()).isEqualTo(1);
+        assertThat(basketList.get(0).getStatus()).isEqualTo(BasketStatus.ACTIVE);
+        assertThat(basketList.get(0).getBasketItems().size()).isEqualTo(0);
     }
 }

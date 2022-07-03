@@ -1,13 +1,23 @@
 package com.smartiq.pim.web.rest;
 
 import com.smartiq.pim.domain.Basket;
+import com.smartiq.pim.domain.BasketItem;
+import com.smartiq.pim.domain.Product;
+import com.smartiq.pim.domain.User;
+import com.smartiq.pim.domain.enumeration.BasketStatus;
+import com.smartiq.pim.repository.BasketItemRepository;
 import com.smartiq.pim.repository.BasketRepository;
+import com.smartiq.pim.repository.ProductRepository;
+import com.smartiq.pim.repository.UserRepository;
+import com.smartiq.pim.security.SecurityUtils;
 import com.smartiq.pim.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -42,8 +52,22 @@ public class BasketResource {
 
     private final BasketRepository basketRepository;
 
-    public BasketResource(BasketRepository basketRepository) {
+    private final UserRepository userRepository;
+
+    private final BasketItemRepository basketItemRepository;
+
+    private final ProductRepository productRepository;
+
+    public BasketResource(
+        BasketRepository basketRepository,
+        UserRepository userRepository,
+        BasketItemRepository basketItemRepository,
+        ProductRepository productRepository
+    ) {
         this.basketRepository = basketRepository;
+        this.userRepository = userRepository;
+        this.basketItemRepository = basketItemRepository;
+        this.productRepository = productRepository;
     }
 
     /**
@@ -193,9 +217,65 @@ public class BasketResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
-    //    @GetMapping("/baskets/createOrGetActiveBasket")
-    //    public ResponseEntity<Basket> createOrGetActiveBasket() {
-    //        Optional<Basket> basket = basketRepository.findById(id);
-    //        return ResponseUtil.wrapOrNotFound(basket);
-    //    }
+
+    @GetMapping("/baskets/createOrGetActiveBasket")
+    public ResponseEntity<Basket> createOrGetActiveBasket() {
+        return ResponseEntity.ok().body(getCurrentBasket());
+    }
+
+    @PostMapping("/baskets/addItem/{productId}")
+    public ResponseEntity<Basket> addItem(@PathVariable Long productId) {
+        Basket basket = getCurrentBasket();
+
+        BasketItem basketItem = new BasketItem();
+        basketItem.setProduct(productRepository.getById(productId));
+        basketItem.setBasket(basket);
+        basketItem.setQuantity(1);
+        basketItem.setTotalCost(basketItem.getProduct().getPrice().intValue());
+        basket.getBasketItems().add(basketItem);
+
+        basket.setTotalCost(calculateTotalBasketCost(basket));
+        basket = basketRepository.save(basket);
+
+        return ResponseEntity.ok().body(basket);
+    }
+
+    @GetMapping("/baskets/deleteItem/{basketItemId}")
+    public ResponseEntity<Basket> deleteItem(@PathVariable Long basketItemId, HttpServletRequest httpServletRequest) {
+        Basket basket = getCurrentBasket();
+        for (BasketItem basketItem : basket.getBasketItems()) {
+            if (basketItem.getId().longValue() == basketItemId) {
+                basket.getBasketItems().remove(basketItem);
+                break;
+            }
+        }
+
+        basket = basketRepository.save(basket);
+
+        return ResponseEntity.ok().body(basket);
+    }
+
+    private Basket getCurrentBasket() {
+        List<Basket> baskets = basketRepository.findActiveBasketOfCurrentUser();
+        Basket currentBasket = null;
+        SecurityUtils.getCurrentUserLogin().get();
+        if (baskets.size() > 0) currentBasket = baskets.get(0); else {
+            Basket basket = new Basket();
+            basket.setCreateDate(LocalDate.now());
+            basket.setStatus(BasketStatus.ACTIVE);
+            basket.setTotalCost(0d);
+            Optional<User> user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin().get());
+            basket.setUser(user.get());
+            currentBasket = basketRepository.save(basket);
+        }
+        return currentBasket;
+    }
+
+    private Double calculateTotalBasketCost(Basket basket) {
+        Double total = Double.valueOf(0);
+        for (BasketItem basketItem : basket.getBasketItems()) {
+            total = total + basketItem.getProduct().getPrice();
+        }
+        return total;
+    }
 }

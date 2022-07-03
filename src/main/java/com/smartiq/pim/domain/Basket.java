@@ -1,5 +1,6 @@
 package com.smartiq.pim.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.smartiq.pim.domain.enumeration.BasketStatus;
 import java.io.Serializable;
@@ -39,7 +40,11 @@ public class Basket implements Serializable {
     @Column(name = "total_cost", nullable = false)
     private Double totalCost;
 
-    @OneToMany(mappedBy = "basket", fetch = FetchType.EAGER)
+    @ManyToOne
+    @JsonIgnore
+    private User user;
+
+    @OneToMany(mappedBy = "basket", fetch = FetchType.EAGER, orphanRemoval = true)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "basket", "product" }, allowSetters = true)
     private Set<BasketItem> basketItems = new HashSet<>();
@@ -96,6 +101,19 @@ public class Basket implements Serializable {
 
     public void setTotalCost(Double totalCost) {
         this.totalCost = totalCost;
+    }
+
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Basket user(User user) {
+        this.setUser(user);
+        return this;
     }
 
     public Set<BasketItem> getBasketItems() {
