@@ -6,9 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.smartiq.pim.IntegrationTest;
-import com.smartiq.pim.domain.Category;
 import com.smartiq.pim.domain.Product;
-import com.smartiq.pim.repository.CategoryRepository;
 import com.smartiq.pim.repository.ProductRepository;
 import java.util.List;
 import java.util.Random;
@@ -57,9 +55,6 @@ class ProductResourceIT {
 
     @Autowired
     private ProductRepository productRepository;
-
-    @Autowired
-    private CategoryRepository categoryRepository;
 
     @Autowired
     private EntityManager em;
@@ -487,29 +482,5 @@ class ProductResourceIT {
         // Validate the database contains one less item
         List<Product> productList = productRepository.findAll();
         assertThat(productList).hasSize(databaseSizeBeforeDelete - 1);
-    }
-
-    @Test
-    @Transactional
-    void getProductsOfCategory() throws Exception {
-        // Initialize the database
-        Category category = new Category();
-        category.setName("category");
-        categoryRepository.save(category);
-        product.setCategory(category);
-        productRepository.saveAndFlush(product);
-
-        // Get all the productList
-        restProductMockMvc
-            .perform(get(ENTITY_API_URL + "/getProductListOfCategory/" + category.getId()))
-            .andExpect(status().isOk())
-            .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
-            .andExpect(jsonPath("$.[*].id").value(hasItem(product.getId().intValue())))
-            .andExpect(jsonPath("$.[*].name").value(hasItem(DEFAULT_NAME)))
-            .andExpect(jsonPath("$.[*].description").value(hasItem(DEFAULT_DESCRIPTION)))
-            .andExpect(jsonPath("$.[*].price").value(hasItem(DEFAULT_PRICE.doubleValue())))
-            .andExpect(jsonPath("$.[*].stock").value(hasItem(DEFAULT_STOCK)))
-            .andExpect(jsonPath("$.[*].photoContentType").value(hasItem(DEFAULT_PHOTO_CONTENT_TYPE)))
-            .andExpect(jsonPath("$.[*].photo").value(hasItem(Base64Utils.encodeToString(DEFAULT_PHOTO))));
     }
 }

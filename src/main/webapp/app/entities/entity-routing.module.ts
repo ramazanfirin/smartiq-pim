@@ -14,6 +14,16 @@ import { RouterModule } from '@angular/router';
         data: { pageTitle: 'pimApp.product.home.title' },
         loadChildren: () => import('./product/product.module').then(m => m.ProductModule),
       },
+      {
+        path: 'basket',
+        data: { pageTitle: 'pimApp.basket.home.title' },
+        loadChildren: () => import('./basket/basket.module').then(m => m.BasketModule),
+      },
+      {
+        path: 'basket-item',
+        data: { pageTitle: 'pimApp.basketItem.home.title' },
+        loadChildren: () => import('./basket-item/basket-item.module').then(m => m.BasketItemModule),
+      },
       /* jhipster-needle-add-entity-route - JHipster will add entity modules routes here */
     ]),
   ],

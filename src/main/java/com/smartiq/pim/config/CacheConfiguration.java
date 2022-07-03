@@ -54,6 +54,10 @@ public class CacheConfiguration {
             createCache(cm, com.smartiq.pim.domain.Category.class.getName());
             createCache(cm, com.smartiq.pim.domain.Category.class.getName() + ".products");
             createCache(cm, com.smartiq.pim.domain.Product.class.getName());
+            createCache(cm, com.smartiq.pim.domain.Product.class.getName() + ".basketItems");
+            createCache(cm, com.smartiq.pim.domain.Basket.class.getName());
+            createCache(cm, com.smartiq.pim.domain.Basket.class.getName() + ".basketItems");
+            createCache(cm, com.smartiq.pim.domain.BasketItem.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

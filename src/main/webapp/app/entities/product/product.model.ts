@@ -1,4 +1,5 @@
 import { ICategory } from 'app/entities/category/category.model';
+import { IBasketItem } from 'app/entities/basket-item/basket-item.model';
 
 export interface IProduct {
   id?: number;
@@ -9,6 +10,7 @@ export interface IProduct {
   photoContentType?: string | null;
   photo?: string | null;
   category?: ICategory | null;
+  basketItems?: IBasketItem[] | null;
 }
 
 export class Product implements IProduct {
@@ -20,7 +22,8 @@ export class Product implements IProduct {
     public stock?: number,
     public photoContentType?: string | null,
     public photo?: string | null,
-    public category?: ICategory | null
+    public category?: ICategory | null,
+    public basketItems?: IBasketItem[] | null
   ) {}
 }
 

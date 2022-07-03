@@ -1,0 +1,39 @@
+{
+  "applications": "*",
+  "changelogDate": "20220703054703",
+  "dto": "no",
+  "embedded": false,
+  "entityTableName": "basket",
+  "fields": [
+    {
+      "fieldName": "createDate",
+      "fieldType": "LocalDate",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "BasketStatus",
+      "fieldValidateRules": ["required"],
+      "fieldValues": "ACTIVE,EXPIRED,PAID"
+    },
+    {
+      "fieldName": "totalCost",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "fluentMethods": true,
+  "jpaMetamodelFiltering": false,
+  "name": "Basket",
+  "pagination": "pagination",
+  "readOnly": false,
+  "relationships": [
+    {
+      "otherEntityName": "basketItem",
+      "otherEntityRelationshipName": "basket",
+      "relationshipName": "basketItem",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "service": "no"
+}

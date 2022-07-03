@@ -1,0 +1,27 @@
+{
+  "pimApp": {
+    "basketItem": {
+      "home": {
+        "title": "Basket Items",
+        "refreshListLabel": "Refresh list",
+        "createLabel": "Create a new Basket Item",
+        "createOrEditLabel": "Create or edit a Basket Item",
+        "notFound": "No Basket Items found"
+      },
+      "created": "A new Basket Item is created with identifier {{ param }}",
+      "updated": "A Basket Item is updated with identifier {{ param }}",
+      "deleted": "A Basket Item is deleted with identifier {{ param }}",
+      "delete": {
+        "question": "Are you sure you want to delete Basket Item {{ id }}?"
+      },
+      "detail": {
+        "title": "Basket Item"
+      },
+      "id": "ID",
+      "quantity": "Quantity",
+      "totalCost": "Total Cost",
+      "basket": "Basket",
+      "product": "Product"
+    }
+  }
+}

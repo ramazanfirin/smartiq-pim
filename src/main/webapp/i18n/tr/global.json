@@ -9,6 +9,8 @@
         "main": "Varlıklar",
         "category": "Category",
         "product": "Product",
+        "basket": "Basket",
+        "basketItem": "Basket Item",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

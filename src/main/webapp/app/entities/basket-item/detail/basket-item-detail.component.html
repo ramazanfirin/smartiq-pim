@@ -1,0 +1,48 @@
+<div class="d-flex justify-content-center">
+  <div class="col-8">
+    <div *ngIf="basketItem">
+      <h2 data-cy="basketItemDetailsHeading"><span jhiTranslate="pimApp.basketItem.detail.title">Basket Item</span></h2>
+
+      <hr />
+
+      <jhi-alert-error></jhi-alert-error>
+
+      <jhi-alert></jhi-alert>
+
+      <dl class="row-md jh-entity-details">
+        <dt><span jhiTranslate="global.field.id">ID</span></dt>
+        <dd>
+          <span>{{ basketItem.id }}</span>
+        </dd>
+        <dt><span jhiTranslate="pimApp.basketItem.quantity">Quantity</span></dt>
+        <dd>
+          <span>{{ basketItem.quantity }}</span>
+        </dd>
+        <dt><span jhiTranslate="pimApp.basketItem.totalCost">Total Cost</span></dt>
+        <dd>
+          <span>{{ basketItem.totalCost }}</span>
+        </dd>
+        <dt><span jhiTranslate="pimApp.basketItem.basket">Basket</span></dt>
+        <dd>
+          <div *ngIf="basketItem.basket">
+            <a [routerLink]="['/basket', basketItem.basket?.id, 'view']">{{ basketItem.basket?.id }}</a>
+          </div>
+        </dd>
+        <dt><span jhiTranslate="pimApp.basketItem.product">Product</span></dt>
+        <dd>
+          <div *ngIf="basketItem.product">
+            <a [routerLink]="['/product', basketItem.product?.id, 'view']">{{ basketItem.product?.id }}</a>
+          </div>
+        </dd>
+      </dl>
+
+      <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
+        <fa-icon icon="arrow-left"></fa-icon>&nbsp;<span jhiTranslate="entity.action.back">Back</span>
+      </button>
+
+      <button type="button" [routerLink]="['/basket-item', basketItem.id, 'edit']" class="btn btn-primary">
+        <fa-icon icon="pencil-alt"></fa-icon>&nbsp;<span jhiTranslate="entity.action.edit">Edit</span>
+      </button>
+    </div>
+  </div>
+</div>

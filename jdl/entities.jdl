@@ -10,10 +10,33 @@ entity Product {
   photo ImageBlob
 }
 
+entity Basket{
+  createDate LocalDate required
+  status BasketStatus required
+  totalCost Double required
+}
+
+entity BasketItem{
+  quantity Integer required
+  totalCost Integer required	
+}
+
 
 relationship ManyToOne {
   Product to Category
+  BasketItem to Basket
+  BasketItem to Product
+  
+}
+
+
+enum BasketStatus {
+  ACTIVE,
+  EXPIRED,
+  PAID
 }
 
 paginate Category with pagination
 paginate Product with pagination
+paginate Basket with pagination
+paginate BasketItem with pagination

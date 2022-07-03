@@ -1,0 +1,10 @@
+{
+  "pimApp": {
+    "BasketStatus": {
+      "null": "",
+      "ACTIVE": "ACTIVE",
+      "EXPIRED": "EXPIRED",
+      "PAID": "PAID"
+    }
+  }
+}

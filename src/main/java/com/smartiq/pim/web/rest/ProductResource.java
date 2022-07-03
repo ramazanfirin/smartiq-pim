@@ -1,6 +1,5 @@
 package com.smartiq.pim.web.rest;
 
-import com.smartiq.pim.domain.Category;
 import com.smartiq.pim.domain.Product;
 import com.smartiq.pim.repository.ProductRepository;
 import com.smartiq.pim.web.rest.errors.BadRequestAlertException;
@@ -202,12 +201,5 @@ public class ProductResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
-    }
-
-    @GetMapping("/products/getProductListOfCategory/{id}")
-    public ResponseEntity<List<Product>> getProductListOfCategory(@PathVariable Long id) {
-        log.debug("REST request to get Category : {}", id);
-        List<Product> result = productRepository.getProductListOfCategory(id);
-        return ResponseEntity.ok().body(result);
     }
 }

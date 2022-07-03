@@ -23,7 +23,8 @@
       "price": "Price",
       "stock": "Stock",
       "photo": "Photo",
-      "category": "Category"
+      "category": "Category",
+      "basketItem": "Basket Item"
     }
   }
 }

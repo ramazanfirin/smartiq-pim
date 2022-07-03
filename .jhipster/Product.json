@@ -41,6 +41,12 @@
       "otherEntityRelationshipName": "product",
       "relationshipName": "category",
       "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "basketItem",
+      "otherEntityRelationshipName": "product",
+      "relationshipName": "basketItem",
+      "relationshipType": "one-to-many"
     }
   ],
   "service": "no"
