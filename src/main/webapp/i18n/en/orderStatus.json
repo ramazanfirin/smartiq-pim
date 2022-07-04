@@ -1,0 +1,10 @@
+{
+  "pimApp": {
+    "OrderStatus": {
+      "null": "",
+      "NEW": "NEW",
+      "COMPLETED": "COMPLETED",
+      "CANCELLED": "CANCELLED"
+    }
+  }
+}

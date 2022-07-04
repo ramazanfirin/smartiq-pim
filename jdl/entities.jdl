@@ -21,12 +21,26 @@ entity BasketItem{
   totalCost Integer required	
 }
 
+entity Address{
+  name String required
+  city String required
+  district String required
+  details String required
+}
+
+entity Order{
+  createDate LocalDate required
+  status OrderStatus required
+}
 
 relationship ManyToOne {
   Product to Category
   BasketItem to Basket
   BasketItem to Product
   Basket to User
+  Address to User
+  Order to User
+  Order to Basket
 }
 
 
@@ -34,6 +48,12 @@ enum BasketStatus {
   ACTIVE,
   EXPIRED,
   PAID
+}
+
+enum OrderStatus {
+  NEW,
+  COMPLETED,
+  CANCELLED
 }
 
 paginate Category with pagination

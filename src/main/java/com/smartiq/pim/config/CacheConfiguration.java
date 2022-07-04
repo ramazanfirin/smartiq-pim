@@ -58,6 +58,9 @@ public class CacheConfiguration {
             createCache(cm, com.smartiq.pim.domain.Basket.class.getName());
             createCache(cm, com.smartiq.pim.domain.Basket.class.getName() + ".basketItems");
             createCache(cm, com.smartiq.pim.domain.BasketItem.class.getName());
+            createCache(cm, com.smartiq.pim.domain.Basket.class.getName() + ".orders");
+            createCache(cm, com.smartiq.pim.domain.Address.class.getName());
+            createCache(cm, com.smartiq.pim.domain.Order.class.getName());
             // jhipster-needle-ehcache-add-entry
         };
     }

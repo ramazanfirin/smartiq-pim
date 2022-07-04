@@ -39,6 +39,12 @@
       "otherEntityRelationshipName": "basket",
       "relationshipName": "basketItem",
       "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "order",
+      "otherEntityRelationshipName": "basket",
+      "relationshipName": "order",
+      "relationshipType": "one-to-many"
     }
   ],
   "service": "no"

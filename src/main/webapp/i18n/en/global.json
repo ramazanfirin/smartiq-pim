@@ -11,6 +11,8 @@
         "product": "Product",
         "basket": "Basket",
         "basketItem": "Basket Item",
+        "address": "Address",
+        "order": "Order",
         "jhipster-needle-menu-add-entry": "JHipster will add additional entities here (do not translate!)"
       },
       "account": {

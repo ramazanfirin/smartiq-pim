@@ -22,7 +22,8 @@
       "status": "Status",
       "totalCost": "Total Cost",
       "user": "User",
-      "basketItem": "Basket Item"
+      "basketItem": "Basket Item",
+      "order": "Order"
     }
   }
 }

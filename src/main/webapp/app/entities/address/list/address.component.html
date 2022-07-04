@@ -1,0 +1,88 @@
+<div>
+  <h2 id="page-heading" data-cy="AddressHeading">
+    <span jhiTranslate="pimApp.address.home.title">Addresses</span>
+
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-info me-2" (click)="loadAll()" [disabled]="isLoading">
+        <fa-icon icon="sync" [spin]="isLoading"></fa-icon>
+        <span jhiTranslate="pimApp.address.home.refreshListLabel">Refresh List</span>
+      </button>
+
+      <button
+        id="jh-create-entity"
+        data-cy="entityCreateButton"
+        class="btn btn-primary jh-create-entity create-address"
+        [routerLink]="['/address/new']"
+      >
+        <fa-icon icon="plus"></fa-icon>
+        <span jhiTranslate="pimApp.address.home.createLabel"> Create a new Address </span>
+      </button>
+    </div>
+  </h2>
+
+  <jhi-alert-error></jhi-alert-error>
+
+  <jhi-alert></jhi-alert>
+
+  <div class="alert alert-warning" id="no-result" *ngIf="addresses?.length === 0">
+    <span jhiTranslate="pimApp.address.home.notFound">No addresses found</span>
+  </div>
+
+  <div class="table-responsive" id="entities" *ngIf="addresses && addresses.length > 0">
+    <table class="table table-striped" aria-describedby="page-heading">
+      <thead>
+        <tr>
+          <th scope="col"><span jhiTranslate="global.field.id">ID</span></th>
+          <th scope="col"><span jhiTranslate="pimApp.address.name">Name</span></th>
+          <th scope="col"><span jhiTranslate="pimApp.address.city">City</span></th>
+          <th scope="col"><span jhiTranslate="pimApp.address.district">District</span></th>
+          <th scope="col"><span jhiTranslate="pimApp.address.details">Details</span></th>
+          <th scope="col"><span jhiTranslate="pimApp.address.user">User</span></th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let address of addresses; trackBy: trackId" data-cy="entityTable">
+          <td>
+            <a [routerLink]="['/address', address.id, 'view']">{{ address.id }}</a>
+          </td>
+          <td>{{ address.name }}</td>
+          <td>{{ address.city }}</td>
+          <td>{{ address.district }}</td>
+          <td>{{ address.details }}</td>
+          <td>
+            {{ address.user?.id }}
+          </td>
+          <td class="text-end">
+            <div class="btn-group">
+              <button
+                type="submit"
+                [routerLink]="['/address', address.id, 'view']"
+                class="btn btn-info btn-sm"
+                data-cy="entityDetailsButton"
+              >
+                <fa-icon icon="eye"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.view">View</span>
+              </button>
+
+              <button
+                type="submit"
+                [routerLink]="['/address', address.id, 'edit']"
+                class="btn btn-primary btn-sm"
+                data-cy="entityEditButton"
+              >
+                <fa-icon icon="pencil-alt"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.edit">Edit</span>
+              </button>
+
+              <button type="submit" (click)="delete(address)" class="btn btn-danger btn-sm" data-cy="entityDeleteButton">
+                <fa-icon icon="times"></fa-icon>
+                <span class="d-none d-md-inline" jhiTranslate="entity.action.delete">Delete</span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
