@@ -197,7 +197,7 @@ public class AddressResource {
             .build();
     }
 
-    @GetMapping("/addresses/getAddressesOfCurrentUser/")
+    @GetMapping("/addresses/getAddressesOfCurrentUser")
     public List<Address> getAddressesOfCurrentUser() {
         log.debug("REST request to get all Addresses");
         return addressRepository.findByUserIsCurrentUser();
