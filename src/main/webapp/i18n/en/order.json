@@ -21,7 +21,8 @@
       "createDate": "Create Date",
       "status": "Status",
       "user": "User",
-      "basket": "Basket"
+      "basket": "Basket",
+      "address": "Address"
     }
   }
 }

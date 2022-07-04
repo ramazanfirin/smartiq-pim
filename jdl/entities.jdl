@@ -41,6 +41,7 @@ relationship ManyToOne {
   Address to User
   Order to User
   Order to Basket
+  Order to Address
 }
 
 

@@ -19,5 +19,11 @@
                                  constraintName="fk_jhi_order__basket_id"
                                  referencedColumnNames="id"
                                  referencedTableName="basket"/>
+
+        <addForeignKeyConstraint baseColumnNames="address_id"
+                                 baseTableName="jhi_order"
+                                 constraintName="fk_jhi_order__address_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="address"/>
     </changeSet>
 </databaseChangeLog>

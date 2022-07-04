@@ -37,8 +37,12 @@ public class Order implements Serializable {
     private User user;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "user", "basketItems", "orders" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "user", "orders" }, allowSetters = true)
     private Basket basket;
+
+    @ManyToOne
+    @JsonIgnoreProperties(value = { "user", "orders" }, allowSetters = true)
+    private Address address;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -104,6 +108,19 @@ public class Order implements Serializable {
 
     public Order basket(Basket basket) {
         this.setBasket(basket);
+        return this;
+    }
+
+    public Address getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(Address address) {
+        this.address = address;
+    }
+
+    public Order address(Address address) {
+        this.setAddress(address);
         return this;
     }
 

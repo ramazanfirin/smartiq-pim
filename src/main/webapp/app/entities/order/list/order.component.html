@@ -37,6 +37,7 @@
           <th scope="col"><span jhiTranslate="pimApp.order.status">Status</span></th>
           <th scope="col"><span jhiTranslate="pimApp.order.user">User</span></th>
           <th scope="col"><span jhiTranslate="pimApp.order.basket">Basket</span></th>
+          <th scope="col"><span jhiTranslate="pimApp.order.address">Address</span></th>
           <th scope="col"></th>
         </tr>
       </thead>
@@ -53,6 +54,11 @@
           <td>
             <div *ngIf="order.basket">
               <a [routerLink]="['/basket', order.basket?.id, 'view']">{{ order.basket?.id }}</a>
+            </div>
+          </td>
+          <td>
+            <div *ngIf="order.address">
+              <a [routerLink]="['/address', order.address?.id, 'view']">{{ order.address?.id }}</a>
             </div>
           </td>
           <td class="text-end">

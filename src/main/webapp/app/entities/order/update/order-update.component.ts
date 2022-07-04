@@ -11,6 +11,8 @@ import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/user.service';
 import { IBasket } from 'app/entities/basket/basket.model';
 import { BasketService } from 'app/entities/basket/service/basket.service';
+import { IAddress } from 'app/entities/address/address.model';
+import { AddressService } from 'app/entities/address/service/address.service';
 import { OrderStatus } from 'app/entities/enumerations/order-status.model';
 
 @Component({
@@ -23,6 +25,7 @@ export class OrderUpdateComponent implements OnInit {
 
   usersSharedCollection: IUser[] = [];
   basketsSharedCollection: IBasket[] = [];
+  addressesSharedCollection: IAddress[] = [];
 
   editForm = this.fb.group({
     id: [],
@@ -30,12 +33,14 @@ export class OrderUpdateComponent implements OnInit {
     status: [null, [Validators.required]],
     user: [],
     basket: [],
+    address: [],
   });
 
   constructor(
     protected orderService: OrderService,
     protected userService: UserService,
     protected basketService: BasketService,
+    protected addressService: AddressService,
     protected activatedRoute: ActivatedRoute,
     protected fb: FormBuilder
   ) {}
@@ -70,6 +75,10 @@ export class OrderUpdateComponent implements OnInit {
     return item.id!;
   }
 
+  trackAddressById(_index: number, item: IAddress): number {
+    return item.id!;
+  }
+
   protected subscribeToSaveResponse(result: Observable<HttpResponse<IOrder>>): void {
     result.pipe(finalize(() => this.onSaveFinalize())).subscribe({
       next: () => this.onSaveSuccess(),
@@ -96,10 +105,12 @@ export class OrderUpdateComponent implements OnInit {
       status: order.status,
       user: order.user,
       basket: order.basket,
+      address: order.address,
     });
 
     this.usersSharedCollection = this.userService.addUserToCollectionIfMissing(this.usersSharedCollection, order.user);
     this.basketsSharedCollection = this.basketService.addBasketToCollectionIfMissing(this.basketsSharedCollection, order.basket);
+    this.addressesSharedCollection = this.addressService.addAddressToCollectionIfMissing(this.addressesSharedCollection, order.address);
   }
 
   protected loadRelationshipsOptions(): void {
@@ -114,6 +125,14 @@ export class OrderUpdateComponent implements OnInit {
       .pipe(map((res: HttpResponse<IBasket[]>) => res.body ?? []))
       .pipe(map((baskets: IBasket[]) => this.basketService.addBasketToCollectionIfMissing(baskets, this.editForm.get('basket')!.value)))
       .subscribe((baskets: IBasket[]) => (this.basketsSharedCollection = baskets));
+
+    this.addressService
+      .query()
+      .pipe(map((res: HttpResponse<IAddress[]>) => res.body ?? []))
+      .pipe(
+        map((addresses: IAddress[]) => this.addressService.addAddressToCollectionIfMissing(addresses, this.editForm.get('address')!.value))
+      )
+      .subscribe((addresses: IAddress[]) => (this.addressesSharedCollection = addresses));
   }
 
   protected createFromForm(): IOrder {
@@ -124,6 +143,7 @@ export class OrderUpdateComponent implements OnInit {
       status: this.editForm.get(['status'])!.value,
       user: this.editForm.get(['user'])!.value,
       basket: this.editForm.get(['basket'])!.value,
+      address: this.editForm.get(['address'])!.value,
     };
   }
 }

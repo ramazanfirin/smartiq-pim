@@ -232,6 +232,7 @@ public class BasketResource {
         basketItem.setBasket(basket);
         basketItem.setQuantity(1);
         basketItem.setTotalCost(basketItem.getProduct().getPrice().intValue());
+        basketItemRepository.save(basketItem);
         basket.getBasketItems().add(basketItem);
 
         basket.setTotalCost(calculateTotalBasketCost(basket));

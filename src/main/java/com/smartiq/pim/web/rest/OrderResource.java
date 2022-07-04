@@ -1,10 +1,19 @@
 package com.smartiq.pim.web.rest;
 
+import com.smartiq.pim.domain.Address;
+import com.smartiq.pim.domain.Basket;
 import com.smartiq.pim.domain.Order;
+import com.smartiq.pim.domain.User;
+import com.smartiq.pim.domain.enumeration.OrderStatus;
+import com.smartiq.pim.repository.AddressRepository;
+import com.smartiq.pim.repository.BasketRepository;
 import com.smartiq.pim.repository.OrderRepository;
+import com.smartiq.pim.repository.UserRepository;
+import com.smartiq.pim.security.SecurityUtils;
 import com.smartiq.pim.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,8 +45,22 @@ public class OrderResource {
 
     private final OrderRepository orderRepository;
 
-    public OrderResource(OrderRepository orderRepository) {
+    private final UserRepository userRepository;
+
+    private final BasketRepository basketRepository;
+
+    private final AddressRepository addressRepository;
+
+    public OrderResource(
+        OrderRepository orderRepository,
+        UserRepository userRepository,
+        BasketRepository basketRepository,
+        AddressRepository addressRepository
+    ) {
         this.orderRepository = orderRepository;
+        this.userRepository = userRepository;
+        this.basketRepository = basketRepository;
+        this.addressRepository = addressRepository;
     }
 
     /**
@@ -53,6 +76,30 @@ public class OrderResource {
         if (order.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        if (order.getBasket() != null && order.getBasket().getId() == null) {
+            throw new BadRequestAlertException("Invalid ID", "Basket", "idinvalid");
+        }
+
+        if (order.getAddress() != null && order.getAddress().getId() == null) {
+            throw new BadRequestAlertException("Invalid ID", "Address", "idinvalid");
+        }
+
+        Basket basket = basketRepository.findById(order.getBasket().getId()).get();
+        if (!basket.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().get())) {
+            throw new RuntimeException("No access to Basket");
+        }
+
+        Address address = addressRepository.findById(order.getAddress().getId()).get();
+        if (!address.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().get())) {
+            throw new RuntimeException("No access to Address");
+        }
+        User user = userRepository.findOneByLogin(SecurityUtils.getCurrentUserLogin().get()).get();
+        order.setUser(user);
+        order.setStatus(OrderStatus.NEW);
+        order.setCreateDate(LocalDate.now());
+        order.setBasket(basket);
+        order.setAddress(address);
         Order result = orderRepository.save(order);
         return ResponseEntity
             .created(new URI("/api/orders/" + result.getId()))
@@ -70,27 +117,27 @@ public class OrderResource {
      * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PutMapping("/orders/{id}")
-    public ResponseEntity<Order> updateOrder(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Order order)
-        throws URISyntaxException {
-        log.debug("REST request to update Order : {}, {}", id, order);
-        if (order.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, order.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!orderRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Order result = orderRepository.save(order);
-        return ResponseEntity
-            .ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, order.getId().toString()))
-            .body(result);
-    }
+    //    @PutMapping("/orders/{id}")
+    //    public ResponseEntity<Order> updateOrder(@PathVariable(value = "id", required = false) final Long id, @Valid @RequestBody Order order)
+    //        throws URISyntaxException {
+    //        log.debug("REST request to update Order : {}, {}", id, order);
+    //        if (order.getId() == null) {
+    //            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+    //        }
+    //        if (!Objects.equals(id, order.getId())) {
+    //            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+    //        }
+    //
+    //        if (!orderRepository.existsById(id)) {
+    //            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+    //        }
+    //
+    //        Order result = orderRepository.save(order);
+    //        return ResponseEntity
+    //            .ok()
+    //            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, order.getId().toString()))
+    //            .body(result);
+    //    }
 
     /**
      * {@code PATCH  /orders/:id} : Partial updates given fields of an existing order, field will ignore if it is null
@@ -103,42 +150,42 @@ public class OrderResource {
      * or with status {@code 500 (Internal Server Error)} if the order couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PatchMapping(value = "/orders/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<Order> partialUpdateOrder(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody Order order
-    ) throws URISyntaxException {
-        log.debug("REST request to partial update Order partially : {}, {}", id, order);
-        if (order.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, order.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!orderRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<Order> result = orderRepository
-            .findById(order.getId())
-            .map(existingOrder -> {
-                if (order.getCreateDate() != null) {
-                    existingOrder.setCreateDate(order.getCreateDate());
-                }
-                if (order.getStatus() != null) {
-                    existingOrder.setStatus(order.getStatus());
-                }
-
-                return existingOrder;
-            })
-            .map(orderRepository::save);
-
-        return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, order.getId().toString())
-        );
-    }
+    //    @PatchMapping(value = "/orders/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    //    public ResponseEntity<Order> partialUpdateOrder(
+    //        @PathVariable(value = "id", required = false) final Long id,
+    //        @NotNull @RequestBody Order order
+    //    ) throws URISyntaxException {
+    //        log.debug("REST request to partial update Order partially : {}, {}", id, order);
+    //        if (order.getId() == null) {
+    //            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+    //        }
+    //        if (!Objects.equals(id, order.getId())) {
+    //            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+    //        }
+    //
+    //        if (!orderRepository.existsById(id)) {
+    //            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
+    //        }
+    //
+    //        Optional<Order> result = orderRepository
+    //            .findById(order.getId())
+    //            .map(existingOrder -> {
+    //                if (order.getCreateDate() != null) {
+    //                    existingOrder.setCreateDate(order.getCreateDate());
+    //                }
+    //                if (order.getStatus() != null) {
+    //                    existingOrder.setStatus(order.getStatus());
+    //                }
+    //
+    //                return existingOrder;
+    //            })
+    //            .map(orderRepository::save);
+    //
+    //        return ResponseUtil.wrapOrNotFound(
+    //            result,
+    //            HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, order.getId().toString())
+    //        );
+    //    }
 
     /**
      * {@code GET  /orders} : get all the orders.
@@ -178,5 +225,30 @@ public class OrderResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @GetMapping("/orders/updateAddress/{orderId}/{addressId}")
+    public Order updateAddress(@PathVariable Long orderId, @PathVariable Long addressId) {
+        Order order = orderRepository.findById(orderId).get();
+        if (!order.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().get())) {
+            throw new RuntimeException("No access to Order");
+        }
+
+        Address address = addressRepository.findById(addressId).get();
+        if (!address.getUser().getLogin().equals(SecurityUtils.getCurrentUserLogin().get())) {
+            throw new RuntimeException("No access to Address");
+        }
+
+        order.setAddress(address);
+        orderRepository.save(order);
+        return order;
+    }
+
+    @GetMapping("/orders/cancel/{orderId}")
+    public Order cancel(@PathVariable Long orderId) {
+        Order order = orderRepository.getById(orderId);
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
+        return order;
     }
 }

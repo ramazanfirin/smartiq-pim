@@ -13,6 +13,8 @@ import { IUser } from 'app/entities/user/user.model';
 import { UserService } from 'app/entities/user/user.service';
 import { IBasket } from 'app/entities/basket/basket.model';
 import { BasketService } from 'app/entities/basket/service/basket.service';
+import { IAddress } from 'app/entities/address/address.model';
+import { AddressService } from 'app/entities/address/service/address.service';
 
 import { OrderUpdateComponent } from './order-update.component';
 
@@ -23,6 +25,7 @@ describe('Order Management Update Component', () => {
   let orderService: OrderService;
   let userService: UserService;
   let basketService: BasketService;
+  let addressService: AddressService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -46,6 +49,7 @@ describe('Order Management Update Component', () => {
     orderService = TestBed.inject(OrderService);
     userService = TestBed.inject(UserService);
     basketService = TestBed.inject(BasketService);
+    addressService = TestBed.inject(AddressService);
 
     comp = fixture.componentInstance;
   });
@@ -89,12 +93,33 @@ describe('Order Management Update Component', () => {
       expect(comp.basketsSharedCollection).toEqual(expectedCollection);
     });
 
+    it('Should call Address query and add missing value', () => {
+      const order: IOrder = { id: 456 };
+      const address: IAddress = { id: 83914 };
+      order.address = address;
+
+      const addressCollection: IAddress[] = [{ id: 94326 }];
+      jest.spyOn(addressService, 'query').mockReturnValue(of(new HttpResponse({ body: addressCollection })));
+      const additionalAddresses = [address];
+      const expectedCollection: IAddress[] = [...additionalAddresses, ...addressCollection];
+      jest.spyOn(addressService, 'addAddressToCollectionIfMissing').mockReturnValue(expectedCollection);
+
+      activatedRoute.data = of({ order });
+      comp.ngOnInit();
+
+      expect(addressService.query).toHaveBeenCalled();
+      expect(addressService.addAddressToCollectionIfMissing).toHaveBeenCalledWith(addressCollection, ...additionalAddresses);
+      expect(comp.addressesSharedCollection).toEqual(expectedCollection);
+    });
+
     it('Should update editForm', () => {
       const order: IOrder = { id: 456 };
       const user: IUser = { id: 60405 };
       order.user = user;
       const basket: IBasket = { id: 7789 };
       order.basket = basket;
+      const address: IAddress = { id: 39703 };
+      order.address = address;
 
       activatedRoute.data = of({ order });
       comp.ngOnInit();
@@ -102,6 +127,7 @@ describe('Order Management Update Component', () => {
       expect(comp.editForm.value).toEqual(expect.objectContaining(order));
       expect(comp.usersSharedCollection).toContain(user);
       expect(comp.basketsSharedCollection).toContain(basket);
+      expect(comp.addressesSharedCollection).toContain(address);
     });
   });
 
@@ -182,6 +208,14 @@ describe('Order Management Update Component', () => {
       it('Should return tracked Basket primary key', () => {
         const entity = { id: 123 };
         const trackResult = comp.trackBasketById(0, entity);
+        expect(trackResult).toEqual(entity.id);
+      });
+    });
+
+    describe('trackAddressById', () => {
+      it('Should return tracked Address primary key', () => {
+        const entity = { id: 123 };
+        const trackResult = comp.trackAddressById(0, entity);
         expect(trackResult).toEqual(entity.id);
       });
     });

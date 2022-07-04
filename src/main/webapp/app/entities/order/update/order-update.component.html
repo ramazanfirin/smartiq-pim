@@ -79,6 +79,19 @@
             </option>
           </select>
         </div>
+
+        <div class="row mb-3">
+          <label class="form-label" jhiTranslate="pimApp.order.address" for="field_address">Address</label>
+          <select class="form-control" id="field_address" data-cy="address" name="address" formControlName="address">
+            <option [ngValue]="null"></option>
+            <option
+              [ngValue]="addressOption.id === editForm.get('address')!.value?.id ? editForm.get('address')!.value : addressOption"
+              *ngFor="let addressOption of addressesSharedCollection; trackBy: trackAddressById"
+            >
+              {{ addressOption.id }}
+            </option>
+          </select>
+        </div>
       </div>
 
       <div>

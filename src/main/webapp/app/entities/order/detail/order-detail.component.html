@@ -32,6 +32,12 @@
             <a [routerLink]="['/basket', order.basket?.id, 'view']">{{ order.basket?.id }}</a>
           </div>
         </dd>
+        <dt><span jhiTranslate="pimApp.order.address">Address</span></dt>
+        <dd>
+          <div *ngIf="order.address">
+            <a [routerLink]="['/address', order.address?.id, 'view']">{{ order.address?.id }}</a>
+          </div>
+        </dd>
       </dl>
 
       <button type="submit" (click)="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">

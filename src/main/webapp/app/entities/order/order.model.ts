@@ -1,6 +1,7 @@
 import dayjs from 'dayjs/esm';
 import { IUser } from 'app/entities/user/user.model';
 import { IBasket } from 'app/entities/basket/basket.model';
+import { IAddress } from 'app/entities/address/address.model';
 import { OrderStatus } from 'app/entities/enumerations/order-status.model';
 
 export interface IOrder {
@@ -9,6 +10,7 @@ export interface IOrder {
   status?: OrderStatus;
   user?: IUser | null;
   basket?: IBasket | null;
+  address?: IAddress | null;
 }
 
 export class Order implements IOrder {
@@ -17,7 +19,8 @@ export class Order implements IOrder {
     public createDate?: dayjs.Dayjs,
     public status?: OrderStatus,
     public user?: IUser | null,
-    public basket?: IBasket | null
+    public basket?: IBasket | null,
+    public address?: IAddress | null
   ) {}
 }
 

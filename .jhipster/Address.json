@@ -37,6 +37,12 @@
       "otherEntityRelationshipName": "address",
       "relationshipName": "user",
       "relationshipType": "many-to-one"
+    },
+    {
+      "otherEntityName": "order",
+      "otherEntityRelationshipName": "address",
+      "relationshipName": "order",
+      "relationshipType": "one-to-many"
     }
   ],
   "service": "no"
