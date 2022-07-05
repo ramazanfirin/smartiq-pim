@@ -10,13 +10,16 @@ import com.smartiq.pim.repository.BasketRepository;
 import com.smartiq.pim.repository.OrderRepository;
 import com.smartiq.pim.repository.UserRepository;
 import com.smartiq.pim.security.SecurityUtils;
+import com.smartiq.pim.service.OmIntegrationService;
 import com.smartiq.pim.web.rest.errors.BadRequestAlertException;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -51,16 +54,20 @@ public class OrderResource {
 
     private final AddressRepository addressRepository;
 
+    private final OmIntegrationService omIntegrationService;
+
     public OrderResource(
         OrderRepository orderRepository,
         UserRepository userRepository,
         BasketRepository basketRepository,
-        AddressRepository addressRepository
+        AddressRepository addressRepository,
+        OmIntegrationService omIntegrationService
     ) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.basketRepository = basketRepository;
         this.addressRepository = addressRepository;
+        this.omIntegrationService = omIntegrationService;
     }
 
     /**
@@ -69,9 +76,11 @@ public class OrderResource {
      * @param order the order to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new order, or with status {@code 400 (Bad Request)} if the order has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * @throws IOException
      */
     @PostMapping("/orders")
-    public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order) throws URISyntaxException {
+    public ResponseEntity<Order> createOrder(@Valid @RequestBody Order order, HttpServletRequest httpServletRequest)
+        throws URISyntaxException, IOException {
         log.debug("REST request to save Order : {}", order);
         if (order.getId() != null) {
             throw new BadRequestAlertException("A new order cannot already have an ID", ENTITY_NAME, "idexists");
@@ -101,6 +110,9 @@ public class OrderResource {
         order.setBasket(basket);
         order.setAddress(address);
         Order result = orderRepository.save(order);
+        String authTokenHeader = httpServletRequest.getHeader("Authorization");
+        omIntegrationService.createOrder(result, authTokenHeader);
+
         return ResponseEntity
             .created(new URI("/api/orders/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
@@ -245,10 +257,11 @@ public class OrderResource {
     }
 
     @GetMapping("/orders/cancel/{orderId}")
-    public Order cancel(@PathVariable Long orderId) {
+    public Order cancel(@PathVariable Long orderId, HttpServletRequest httpServletRequest) throws IOException {
         Order order = orderRepository.getById(orderId);
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
+        omIntegrationService.cancelOrder(orderId, httpServletRequest.getHeader("Authorization"));
         return order;
     }
 }

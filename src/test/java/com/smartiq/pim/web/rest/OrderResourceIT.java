@@ -2,6 +2,10 @@ package com.smartiq.pim.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
@@ -23,6 +27,8 @@ import com.smartiq.pim.repository.BasketRepository;
 import com.smartiq.pim.repository.OrderRepository;
 import com.smartiq.pim.repository.UserRepository;
 import com.smartiq.pim.security.SecurityUtils;
+import com.smartiq.pim.service.OmIntegrationService;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.List;
@@ -31,8 +37,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -70,6 +79,9 @@ class OrderResourceIT {
     @Autowired
     AddressRepository addressRepository;
 
+    @MockBean
+    OmIntegrationService omIntegrationService;
+
     @Autowired
     private EntityManager em;
 
@@ -101,8 +113,11 @@ class OrderResourceIT {
     }
 
     @BeforeEach
-    public void initTest() {
+    public void initTest() throws IOException {
         order = createEntity(em);
+        MockitoAnnotations.openMocks(this);
+        doNothing().when(omIntegrationService).createOrder(any(Order.class), anyString());
+        doNothing().when(omIntegrationService).cancelOrder(anyLong(), anyString());
     }
 
     @Test

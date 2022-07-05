@@ -139,5 +139,5 @@ jhipster:
 # More documentation is available at:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
-
-# application:
+application:
+  orderManagementAppLink: http://localhost:8081
