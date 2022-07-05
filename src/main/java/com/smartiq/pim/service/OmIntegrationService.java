@@ -7,6 +7,11 @@ import com.smartiq.pim.config.ApplicationProperties;
 import com.smartiq.pim.domain.Order;
 import com.smartiq.pim.domain.enumeration.OrderStatus;
 import com.smartiq.pim.service.dto.CreateOrderManagementDTO;
+import com.squareup.okhttp.MediaType;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +19,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import org.testcontainers.shaded.okhttp3.MediaType;
-import org.testcontainers.shaded.okhttp3.OkHttpClient;
-import org.testcontainers.shaded.okhttp3.Request;
-import org.testcontainers.shaded.okhttp3.RequestBody;
-import org.testcontainers.shaded.okhttp3.Response;
 
 @Service
 @Transactional
