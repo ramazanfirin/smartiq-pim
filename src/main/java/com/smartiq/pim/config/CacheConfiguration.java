@@ -46,6 +46,7 @@ public class CacheConfiguration {
     @Bean
     public JCacheManagerCustomizer cacheManagerCustomizer() {
         return cm -> {
+            createCache(cm, "products");
             createCache(cm, com.smartiq.pim.repository.UserRepository.USERS_BY_LOGIN_CACHE);
             createCache(cm, com.smartiq.pim.repository.UserRepository.USERS_BY_EMAIL_CACHE);
             createCache(cm, com.smartiq.pim.domain.User.class.getName());
